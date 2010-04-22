@@ -361,9 +361,9 @@ namespace <#=Namespace #>
             {
                 if(_<#=col.CleanName #>!=value){
                     _<#=col.CleanName #>=value;
-                    var col=tbl.Columns.SingleOrDefault(x=>x.Name=="<#=col.Name #>");
+                    var col=tbl.Columns.SingleOrDefault(x=>x.ObjName=="<#=col.Name #>");
                     if(col!=null){
-                        if(!_dirtyColumns.Any(x=>x.Name==col.Name) && _isLoaded){
+                        if(!_dirtyColumns.Any(x=>x.ObjName==col.ObjName) && _isLoaded){
                             _dirtyColumns.Add(col);
                         }
                     }
@@ -462,13 +462,24 @@ namespace <#=Namespace #>
 <#}#>
             
             var key=KeyValue();
-            if(key==null){
-                var newKey=_repo.Add(this,provider);
-                this.SetKeyValue(newKey);
-            }else{
-                _repo.Add(this,provider);
-            }
+<#if(tbl.PK.AutoIncrement){#>
+			if (key==null<#if(tbl.PK.SysType=="int"){#> || (int)key == 0<#}#>) {
+				var newKey=_repo.Add(this,provider);
+				this.SetKeyValue(newKey);
+			}else{
+				_repo.Add(this,provider);
+			}
+<#}else{#>
+			if(key==null){
+				var newKey=_repo.Add(this,provider);
+				this.SetKeyValue(newKey);
+			}else{
+				_repo.Add(this,provider);
+			}
+<#}#>
+            
             SetIsNew(false);
+            SetIsLoaded(true);
             OnSaved();
         }
         

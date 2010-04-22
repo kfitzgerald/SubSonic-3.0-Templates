@@ -35,10 +35,18 @@ const string FKSql=@"SELECT
     PT ON PT.TABLE_NAME = PK.TABLE_NAME
     WHERE FK.Table_NAME=@tableName OR PK.Table_NAME=@tableName";
 
-
-const string TABLE_SQL=@"SELECT *
+// Tables only (no views)
+/*const string TABLE_SQL=@"SELECT *
     FROM  INFORMATION_SCHEMA.TABLES
-    WHERE TABLE_TYPE='BASE TABLE'";
+    WHERE TABLE_TYPE='BASE TABLE'";*/
+
+// Tables and views
+const string TABLE_SQL=@"SELECT * 
+FROM INFORMATION_SCHEMA.TABLES 
+WHERE TABLE_TYPE='BASE TABLE' 
+union 
+select Table_catalog, table_schema, table_name, 'View' table_type 
+from information_schema.views";
 
 const string COLUMN_SQL=@"SELECT 
         TABLE_CATALOG AS [Database],
@@ -102,7 +110,8 @@ List<SP> GetSPs(){
         var sp=new SP();
 	    sp.Name=row["ROUTINE_NAME"].ToString();
 	    
-        if(spType=="PROCEDURE" &! sp.Name.StartsWith("sp_")){
+        if(spType=="PROCEDURE" &! sp.Name.StartsWith("sp_") && !ExcludeTables.Contains(sp.Name))
+		{
             
     	    sp.CleanName=CleanUp(sp.Name);
             

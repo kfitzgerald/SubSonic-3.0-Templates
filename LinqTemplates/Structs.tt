@@ -36,26 +36,27 @@ namespace <#=Namespace#> {
 	                IsNullable = <#=col.IsNullable.ToString().ToLower()#>,
 	                AutoIncrement = <#=col.AutoIncrement.ToString().ToLower()#>,
 	                IsForeignKey = <#=col.IsForeignKey.ToString().ToLower()#>,
-	                MaxLength = <#=col.MaxLength#>
+	                MaxLength = <#=col.MaxLength#>,	
+	                FriendlyName = "<#=col.CleanName#>"
                 });
 <#          }#>                    
                 
                 
             }
-            
+
 <#          foreach(var col in tbl.Columns){#>
             public IColumn <#=col.CleanName#>{
                 get{
                     return this.GetColumn("<#=col.Name#>");
                 }
             }
-            				
+				
    			public static string <#= col.CleanName #>Column{
 			      get{
         			return "<#= col.Name #>";
       			}
 		    }
-           
+            
 <#          }#>                    
         }
         
